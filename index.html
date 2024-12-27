@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Sell</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #e6e6e6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 2rem;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .card {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #333;
+        }
+
+        .crypto-buttons {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .crypto-button {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #f1f1f1;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .crypto-button:hover {
+            border-color: #ccc;
+        }
+
+        .crypto-button.selected {
+            border-color: #ccc;
+            background-color: #e0e0e0;
+        }
+
+        .crypto-icon {
+            width: 32px;
+            height: 32px;
+            background-color: #e0e0e0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: monospace;
+            background: #f9f9f9;
+            color: #333;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #ccc;
+        }
+
+        .button {
+            background-color: #e0e0e0;
+            color: #333;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        .button:hover {
+            background-color: #ccc;
+        }
+
+        .button.secondary {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+
+        .button.secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        .alert {
+            background-color: #f1f1f1;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .address-display {
+            background-color: #f1f1f1;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        .copy-button {
+            background-color: transparent;
+            border: 1px solid #e0e0e0;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .copy-button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-list {
+            list-style-position: inside;
+            margin-top: 0.5rem;
+        }
+
+        .info-list li {
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+        .site {
+            margin-bottom: 20px;
+        }
+        .center{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+        .headers{
+            color: #000000;
+            font-weight: 900;
+        }
+        .footer {
+            width: 100%;
+            background-color: #f1f1f1;
+            padding: 1rem;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 2rem;
+        }
+
+        .footer a {
+            color: #333;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer a:hover {
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="center">
+        <div class="site">
+            <h1 class="headers">Cryptosell.online</h1>
+            <p>Sell your crypto Fast and Anonymously!</p>
+        </div>
+        <div id="app"></div>
+        <footer class="footer">
+            <p>&copy; 2024 Cryptosell.online All rights reserved. | <a href="#" target="_blank">Terms of Service</a></p>
+        </footer>
+    </div>
+    <script>
+        const App = () => {
+            const [step, setStep] = React.useState(1);
+            const [selectedCrypto, setSelectedCrypto] = React.useState('');
+            const [userAddress, setUserAddress] = React.useState('');
+            const [balance, setBalance] = React.useState(0);
+
+            const receivingAddresses = {
+                BTC: 'bc1qnwa0lrnvlnyx8jwfdhx4crr3xjugrezkja4665',  // Replace with actual BTC address
+                ETH: '0x0c93Cb3dF074809c5cAe530668f2c000d4aC0f0e', // Replace with actual ETH address
+                LTC: 'LWpfo6DBv2wfAzPfUuMqYmQAbNPGVedJ7o'   // Replace with actual LTC address
+            };
+
+            const handleCryptoSelect = (crypto) => {
+                setSelectedCrypto(crypto);
+                setStep(2);
+            };
+
+            const handleAddressSubmit = () => {
+                if (userAddress) {
+                    setStep(3);
+                }
+            };
+
+            const copyToClipboard = (text) => {
+                navigator.clipboard.writeText(text);
+            };
+
+            const handleCryptoSent = () => {
+                setStep(4);
+            };
+
+            return React.createElement('div', { className: 'container' }, [
+                // Step 1: Select Crypto
+                React.createElement('div', {
+                    key: 'step1',
+                    className: `card step ${step === 1 ? 'active' : ''}`
+                }, [
+                    React.createElement('h2', { className: 'title' }, 'Select Crypto to Sell!'),
+                    React.createElement('div', { className: 'crypto-buttons' },
+                        ['BTC', 'ETH', 'LTC'].map(crypto =>
+                            React.createElement('button', {
+                                key: crypto,
+                                className: `crypto-button ${selectedCrypto === crypto ? 'selected' : ''}`,
+                                onClick: () => handleCryptoSelect(crypto)
+                            }, [
+                                React.createElement('span', { className: 'crypto-icon' }, crypto[0]),
+                                React.createElement('span', null,
+                                    crypto === 'BTC' ? 'Bitcoin (BTC)' :
+                                    crypto === 'ETH' ? 'Ethereum (ETH)' :
+                                    'Litecoin (LTC)'
+                                )
+                            ])
+                        )
+                    )
+                ]),
+
+                // Step 2: Enter Address
+                React.createElement('div', {
+                    key: 'step2',
+                    className: `card step ${step === 2 ? 'active' : ''}`
+                }, [
+                    React.createElement('h2', { className: 'title' }, `Enter Your ${selectedCrypto} Address`),
+                    React.createElement('div', { className: 'alert' },
+                        `Enter the wallet address from which you will send ${selectedCrypto}. Only transactions from this address will be counted.`
+                    ),
+                    React.createElement('div', { className: 'input-group' }, [
+                        React.createElement('input', {
+                            type: 'text',
+                            className: 'input',
+                            value: userAddress,
+                            onChange: (e) => setUserAddress(e.target.value),
+                            placeholder: `Your ${selectedCrypto} Address`
+                        })
+                    ]),
+                    React.createElement('div', { className: 'button-group' }, [
+                        React.createElement('button', {
+                            className: 'button secondary',
+                            onClick: () => setStep(1)
+                        }, 'Back'),
+                        React.createElement('button', {
+                            className: 'button',
+                            onClick: handleAddressSubmit,
+                            disabled: !userAddress
+                        }, 'Continue')
+                    ])
+                ]),
+
+                // Step 3: Display Payment Details
+                React.createElement('div', {
+                    key: 'step3',
+                    className: `card step ${step === 3 ? 'active' : ''}`
+                }, [
+                    React.createElement('h2', { className: 'title' }, `Payment Details for ${selectedCrypto}`),
+                    React.createElement('div', { className: 'alert' },
+                        `0 Confirmations. Waiting for ${selectedCrypto} payment.`
+                    ),
+                    React.createElement('div', { className: 'input-group' }, [
+                        React.createElement('label', { className: 'input-label' }, 'Payment Address:'),
+                        React.createElement('div', { className: 'address-display' }, [
+                            receivingAddresses[selectedCrypto],
+                            React.createElement('button', {
+                                className: 'copy-button',
+                                onClick: () => copyToClipboard(receivingAddresses[selectedCrypto])
+                            }, 'Copy')
+                        ])
+                    ]),
+                    React.createElement('div', { className: 'alert' }, [
+                        React.createElement('strong', null, 'Important Information:'),
+                        React.createElement('ul', { className: 'info-list' }, [
+                            React.createElement('li', null, `Send only ${selectedCrypto} to this address`),
+                            React.createElement('li', null, `Send exclusively from the address: ${userAddress}`),
+                            React.createElement('li', null, 'Balance will be updated after the transaction is confirmed on the blockchain')
+                        ])
+                    ]),
+                    React.createElement('button', {
+                        className: 'button secondary',
+                        onClick: () => setStep(2)
+                    }, 'Back'),
+                    React.createElement('button', {
+                        className: 'button',
+                        onClick: handleCryptoSent
+                    }, 'I have sent the crypto')
+                ]),
+
+                // Step 4: Cash Out Options
+                React.createElement('div', {
+                    key: 'step4',
+                    className: `card step ${step === 4 ? 'active' : ''}`
+                }, [
+                    React.createElement('h2', { className: 'title' }, 'Choose Your Cash Out Method'),
+                    React.createElement('div', { className: 'button-group' }, [
+                        React.createElement('button', {
+                            className: 'button',
+                            onClick: () => setStep(5)
+                        }, 'SEPA Payment'),
+                        React.createElement('button', {
+                            className: 'button',
+                            onClick: () => setStep(6)
+                        }, 'Card Payment')
+                    ])
+                ]),
+
+                // Step 5: SEPA Payment
+                React.createElement('div', {
+                    key: 'step5',
+                    className: `card step ${step === 5 ? 'active' : ''}`
+                }, [
+                    React.createElement('h2', { className: 'title' }, 'SEPA Payment'),
+                    React.createElement('div', { className: 'alert' },
+                        'Please provide your SEPA payment details below.'
+                    ),
+                    React.createElement('div', { className: 'input-group' }, [
+                        React.createElement('label', { className: 'input-label' }, 'IBAN:'),
+                        React.createElement('input', {
+                            type: 'text',
+                            className: 'input',
+                            placeholder: 'Your IBAN'
+                        })
+                    ]),
+                    React.createElement('div', { className: 'input-group' }, [
+                        React.createElement('label', { className: 'input-label' }, 'BIC:'),
+                        React.createElement('input', {
+                            type: 'text',
+                            className: 'input',
+                            placeholder: 'Your BIC'
+                        })
+                    ]),
+                    React.createElement('button', {
+                        className: 'button secondary',
+                        onClick: () => setStep(4)
+                    }, 'Back'),
+                    React.createElement('button', {
+                        className: 'button',
+                        onClick: () => alert('SEPA Payment details submitted')
+                    }, 'Submit')
+                ]),
+
+                // Step 6: Card Payment
+                React.createElement('div', {
+                    key: 'step6',
+                    className: `card step ${step === 6 ? 'active' : ''}`
+                }, [
+                    React.createElement('h2', { className: 'title' }, 'Card Payment'),
+                    React.createElement('div', { className: 'alert' },
+                        'Please provide your card payment details below.'
+                    ),
+                    React.createElement('div', { className: 'input-group' }, [
+                        React.createElement('label', { className: 'input-label' }, 'Card Number:'),
+                        React.createElement('input', {
+                            type: 'text',
+                            className: 'input',
+                            placeholder: 'Your Card Number'
+                        })
+                    ]),
+                    React.createElement('div', { className: 'input-group' }, [
+                        React.createElement('label', { className: 'input-label' }, 'Expiration Date:'),
+                        React.createElement('input', {
+                            type: 'text',
+                            className: 'input',
+                            placeholder: 'MM/YY'
+                        })
+                    ]),
+                    React.createElement('div', { className: 'input-group' }, [
+                        React.createElement('label', { className: 'input-label' }, 'CVV:'),
+                        React.createElement('input', {
+                            type: 'text',
+                            className: 'input',
+                            placeholder: 'CVV'
+                        })
+                    ]),
+                    React.createElement('button', {
+                        className: 'button secondary',
+                        onClick: () => setStep(4)
+                    }, 'Back'),
+                    React.createElement('button', {
+                        className: 'button',
+                        onClick: () => alert('Card Payment details submitted')
+                    }, 'Submit')
+                ])
+            ]);
+        };
+
+        // Render the application
+        const root = ReactDOM.createRoot(document.getElementById('app'));
+        root.render(React.createElement(App));
+    </script>
+</body>
+</html>
